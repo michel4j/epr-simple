@@ -183,5 +183,5 @@ class Simulation(object):
            
 if __name__ == '__main__':
     sim = Simulation()
-    #sim.run()
+    sim.run()
     sim.analyse()        
