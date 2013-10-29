@@ -3,7 +3,7 @@ import random
 import time
 import sys
 
-NUM_ITERATIONS = 50000000
+NUM_ITERATIONS = 10000000
 
 class ProgressMeter(object):
     """Displays a progress bar so we know how long it will take"""
@@ -73,7 +73,7 @@ class Station(object):
         a = self.get_setting()
         e, p, s = particle
         C = numpy.cos(s*(e - a))**2 - p
-        tau = numpy.random.uniform(0, 1)
+        tau = s + numpy.random.normal(scale=0.18) # add some detector noise
         if abs(C) > tau:
             out = numpy.sign(C)
         else:
@@ -103,8 +103,10 @@ class Simulation(object):
 
     def analyse(self):
         """select coincidences and calculate probabilities for each angle diff"""
-        alice = numpy.load('Alice.npy') # angle, outcome 
-        bob = numpy.load('Bob.npy')  # angle, outcome 
+        alice = self.alice.results
+        bob = self.bob.results
+        #alice = numpy.load('Alice.npy') # angle, outcome 
+        #bob = numpy.load('Bob.npy')  # angle, outcome 
         ab = alice[:,0] - bob[:,0]
         abdeg = numpy.round(numpy.degrees(ab))
         sl_pp = ((alice[:,-1] == +1.0) & (bob[:,-1] == +1.0))
@@ -115,6 +117,7 @@ class Simulation(object):
         sl_bp = (bob[:,-1] == +1.0)
         sl_am = (alice[:,-1] == -1.0)
         sl_bm = (bob[:,-1] == -1.0)
+        sl_nd = ((alice[:,-1] == 0.0) | (bob[:,-1] == 0.0))
 
         pp = abdeg[sl_pp]
         mm = abdeg[sl_mm]
@@ -133,6 +136,14 @@ class Simulation(object):
         yap = numpy.zeros_like(x)
         ybp = numpy.zeros_like(x)
         Eab = numpy.zeros_like(x)
+
+        sl_same = (abdeg == 0.0) & ((alice[:,-1] != 0.0) & (bob[:,-1] != 0.0))
+        sl_opp = (abdeg == 180.0) & ((alice[:,-1] != 0.0) & (bob[:,-1] != 0.0))
+        ysame = (alice[sl_same,1] *  bob[sl_same,1]).mean()
+        yopp = (alice[sl_opp,1] *  bob[sl_opp,1]).mean()
+        #print "Not detected %0.4f" % (len(abdeg[sl_nd])/float(len(abdeg)))
+        print "Same Angle <AB> = %0.4f, QM = -1.0" % (ysame)
+        print "Opposite Angle <AB> = %0.4f, QM = 1.0" % (yopp)
         
         for a in x:
             i = int(a)
@@ -140,6 +151,8 @@ class Simulation(object):
             lmm = len(mm[(mm==a)]) # --
             lpm = len(pm[(pm==a)]) # -+
             lmp = len(mp[(mp==a)]) # +-
+            lap = len(ap[ap==a])
+            lbp = len(bp[bp==a])
             Na = len(ap[ap==a]) +len(am[am==a])
             Nb = len(bp[bp==a]) + len(bm[bm==a])
             tot = lpp + lmm + lpm + lmp
@@ -151,23 +164,27 @@ class Simulation(object):
                 ymp[i] = float(lmp)/tot
             
             Eab[i] = ypp[i] + ymm[i] - ypm[i] - ymp[i]
-            
             # single sided +/- outcome probabilities
             if Na != 0.0:
-                yap[i] = float(len(ap[ap==a]))/Na
+                yap[i] = float(lap)/Na
             if Nb != 0.0:
-                ybp[i] = float(len(bp[bp==a]))/Nb
+                ybp[i] = float(lbp)/Nb
         
         # Plot results   
         from matplotlib import pyplot as plt
         from matplotlib import rcParams
         
+        CHSH = Eab[23] - Eab[68] + Eab[360+23-45] + Eab[68-45]
+        QM = (-numpy.cos(numpy.radians(23)) +
+              numpy.cos(numpy.radians(68)) -
+              numpy.cos(numpy.radians(23-45)) -
+              numpy.cos(numpy.radians(68-45))
+             )
         rcParams['legend.loc'] = 'best'
         rcParams['legend.fontsize'] = 8.5
         rcParams['legend.isaxes'] = False
         rcParams['figure.facecolor'] = 'white'
         rcParams['figure.edgecolor'] = 'white'
-        rcParams['font.sans-serif'] = 'Cantarell'
 
         plt.plot(x, ypp, label='++')
         plt.plot(x, ymm, label='--')
@@ -176,9 +193,11 @@ class Simulation(object):
         plt.plot(x, yap, label='A+')
         plt.plot(x, ybp, label='B+')
         plt.plot(x, Eab, label='E(a,b)')
+        plt.plot(x, -numpy.cos(numpy.radians(x)), 'r:', label='-cos(ab)')
         plt.plot([0.0, 180.0, 360.0], [-1.0, 1.0, -1.0], 'r--')
         plt.legend()
         plt.savefig('epr.png')
+        print "CHSH = %0.4f, Classical <= 2, QM=%0.4f" % (abs(CHSH), abs(QM))
         plt.show()
            
 if __name__ == '__main__':
