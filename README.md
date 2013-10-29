@@ -45,7 +45,7 @@ The detection proceeds as follows:
       If the absolute value of C is greather than τ, 
       the particle is detected in which case the output will be sign(C), 
       otherwise the particle is not detected and the output is 0.
-    - The setting `a` and the output is registed
+    - The setting `a` and the output is registered
 
 Statistical Analysis:
 --------------------    
