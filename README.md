@@ -33,7 +33,8 @@ A particle pair is generated as follows:
 The left particle is the tuple `(e, p1, spin)`
 The right particle is the tuple `(e+phase, p2, spin)`
 
-2) The Detection Stations:
+2) The Detection Stations:  
+
 Two stations exists named `Alice` and `Bob`. Alice will measure the left particle, while Bob will measure the right particle.
 The detection proceeds as follows:  
 
