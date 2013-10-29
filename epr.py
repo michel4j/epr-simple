@@ -6,6 +6,7 @@ import sys
 NUM_ITERATIONS = 10000000
 
 class ProgressMeter(object):
+    """Displays a progress bar so we know how long it will take"""
     def __init__(self, **kw):
         self.total = int(kw.get('total', 100)) # Number of units to process
         self.count = int(kw.get('count', 0))   # Number of units already processed
@@ -19,6 +20,7 @@ class ProgressMeter(object):
         sys.stdout.write(chr(27) + '[s')
 
     def update(self, count, **kw):
+        """Increment progres count by `count` amount"""
         now = time.time()
         self.count += count 
         self.current_rate = self.count/(now - self.start_time)
@@ -37,47 +39,57 @@ class ProgressMeter(object):
             self.last_refresh = time.time()
 
 class Source(object):
-    def __init__(self, variant=1.0):
-        self.variant= variant
+    """Generate and emit two particles with hidden variables"""
+    def __init__(self, spin=0.5, phase=numpy.pi):
+        self.spin = spin
+        self.phase = phase
         
     def emit(self):
-        e = numpy.random.uniform(0.0,numpy.pi*2)
+        e = numpy.random.uniform(0.0,2*numpy.pi)
         p1 = numpy.random.uniform(0.0, 1.0)
         p2 = numpy.random.uniform(0.0, 1.0)
-        lp = (e, p1, self.variant)  # Left particle        
-        rp = (e, p2, self.variant)  # Right particle
+        lp = (e, p1, self.spin)  # Left particle        
+        rp = (self.phase + e, p2, self.spin)  # Right particle
         return lp, rp
 
 class Station(object):
-    def __init__(self):
-        self.results = numpy.empty((NUM_ITERATIONS, 2))  # angle, channel
+    """Detect a particle with a given/random setting"""
+    def __init__(self, fixed_angle=None):
+        """Initialize with fixed_angle, otherwise random fast switching will be used"""
+        self.results = numpy.empty((NUM_ITERATIONS, 2))  # columns: angle, +1/-1/0 outcome
         self.results.fill(numpy.nan)
         self.count = 0
+        self.fixed_angle = fixed_angle
         
     def get_setting(self):
-        return numpy.random.uniform(0.0,numpy.pi*2)
+        """Return the current detector setting"""
+        if self.fixed_angle is None:
+            return numpy.random.uniform(0.0,numpy.pi*2)
+        else:
+            return self.fixed_angle
         
     def detect(self, particle):
+        """Calculate the station outcome for the given `particle`"""
         a = self.get_setting()
         e, p, s = particle
-        threshold = numpy.random.uniform(0, 1)
         C = numpy.cos(s*(e - a))**2 - p
+        threshold = numpy.random.uniform(0, 1)
         if abs(C) > threshold:
             out = numpy.sign(C)
         else:
             out = 0.0             
-        self.results[self.count] = numpy.array([a, out])
+        self.results[self.count] = numpy.array([a, out]) # save angle, outcome pair
         self.count += 1
 
 
 class Simulation(object):
     def __init__(self):
-        self.source = Source(0.5)
+        self.source = Source(spin=0.5, phase=numpy.pi)
         self.alice = Station()
         self.bob = Station()
         
     def run(self):
-        # generate and detect particles
+        """generate and detect particles"""
         progress = ProgressMeter(total=NUM_ITERATIONS)
         for i in range(NUM_ITERATIONS):
             left_particle, right_particle = self.source.emit()
@@ -90,6 +102,7 @@ class Simulation(object):
         numpy.save("Bob", self.bob.results)
 
     def analyse(self):
+        """select coincidences and calculate probabilities for each angle diff"""
         alice = numpy.load('Alice.npy') # angle, outcome 
         bob = numpy.load('Bob.npy')  # angle, outcome 
         ab = alice[:,0] - bob[:,0]
@@ -112,7 +125,7 @@ class Simulation(object):
         am = abdeg[sl_am]
         bm = abdeg[sl_bm]
         
-        x = numpy.arange(180.)
+        x = numpy.arange(360.)
         ypp = numpy.zeros_like(x)
         ymm = numpy.zeros_like(x)
         ypm = numpy.zeros_like(x)
@@ -121,25 +134,29 @@ class Simulation(object):
         ybp = numpy.zeros_like(x)
         Eab = numpy.zeros_like(x)
         
-        # select coincidences and calculate probabilities for each angle diff
         for a in x:
             i = int(a)
             lpp = len(pp[(pp==a)]) # ++
             lmm = len(mm[(mm==a)]) # --
             lpm = len(pm[(pm==a)]) # -+
             lmp = len(mp[(mp==a)]) # +-
+            Na = len(ap[ap==a]) +len(am[am==a])
+            Nb = len(bp[bp==a]) + len(bm[bm==a])
             tot = lpp + lmm + lpm + lmp
             
-            ypp[i] = float(lpp)/tot
-            ymm[i] = float(lmm)/tot
-            ypm[i] = float(lpm)/tot
-            ymp[i] = float(lmp)/tot
+            if tot != 0.0:
+                ypp[i] = float(lpp)/tot
+                ymm[i] = float(lmm)/tot
+                ypm[i] = float(lpm)/tot
+                ymp[i] = float(lmp)/tot
             
             Eab[i] = ypp[i] + ymm[i] - ypm[i] - ymp[i]
             
             # single sided +/- outcome probabilities
-            yap[i] = float(len(ap[ap==a]))/(len(ap[ap==a]) + len(am[am==a]))
-            ybp[i] = float(len(bp[bp==a]))/(len(bp[bp==a]) + len(bm[bm==a]))
+            if Na != 0.0:
+                yap[i] = float(len(ap[ap==a]))/Na
+            if Nb != 0.0:
+                ybp[i] = float(len(bp[bp==a]))/Nb
         
         # Plot results   
         from matplotlib import pyplot as plt
