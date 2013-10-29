@@ -3,7 +3,7 @@ import random
 import time
 import sys
 
-NUM_ITERATIONS = 10000000
+NUM_ITERATIONS = 50000000
 
 class ProgressMeter(object):
     """Displays a progress bar so we know how long it will take"""
@@ -73,8 +73,8 @@ class Station(object):
         a = self.get_setting()
         e, p, s = particle
         C = numpy.cos(s*(e - a))**2 - p
-        threshold = numpy.random.uniform(0, 1)
-        if abs(C) > threshold:
+        tau = numpy.random.uniform(0, 1)
+        if abs(C) > tau:
             out = numpy.sign(C)
         else:
             out = 0.0             
@@ -176,11 +176,12 @@ class Simulation(object):
         plt.plot(x, yap, label='A+')
         plt.plot(x, ybp, label='B+')
         plt.plot(x, Eab, label='E(a,b)')
+        plt.plot([0.0, 180.0, 360.0], [-1.0, 1.0, -1.0], 'r--')
         plt.legend()
         plt.savefig('epr.png')
         plt.show()
            
 if __name__ == '__main__':
     sim = Simulation()
-    sim.run()
+    #sim.run()
     sim.analyse()        

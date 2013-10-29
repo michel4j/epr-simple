@@ -12,8 +12,8 @@ The simulation consists of a Source object, generating particle pairs, to be ana
         e' = e + ϕ, ϕ = {0,π}
         p, q ∈ [0..1)
         s = {1/2, 1}
-        A(a,λ) = sign(cos²(s(e − a))-p)
-        B(b,λ) = sign(cos²(s(e' − b))-q)
+        A(a,λ) = sign(cos²(s(e − a))-p) if |cos²(s(e − a))-p| > τ ∈ [0..1), 0 otherwise
+        B(b,λ) = sign(cos²(s(e' − b))-q) if |cos²(s(e' − a))-p| > τ ∈ [0..1), 0 otherwise
 
 
 1) The Source, and Particles:
@@ -38,14 +38,14 @@ The right particle is the tuple `(e+phase, p2, spin)`
 Two stations exists named `Alice` and `Bob`. Alice will measure the left particle, while Bob will measure the right particle.
 The detection proceeds as follows:  
 
-    - A random angle 'a' is selected in the range [0, 2pi)
-    - A transformed value 'C' is calculated using the three particle properties and 
-      the detector setting 'a' as C = cos(spin*(e-a))**2 - p
-    - A threshold value is selected randomly in the range [0, 1). 
-      If the absolute value of C is greather than the threshold, 
+    - A random angle `a` is selected in the range [0, 2pi)
+    - A transformed value `C` is calculated using the three particle properties and 
+      the detector setting `a` as C = cos(spin*(e-a))**2 - p
+    - A threshold value `τ` is selected randomly in the range [0, 1). 
+      If the absolute value of C is greather than τ, 
       the particle is detected in which case the output will be sign(C), 
       otherwise the particle is not detected and the output is 0.
-    - The setting 'a' and the output is registed
+    - The setting `a` and the output is registed
 
 Statistical Analysis:
 --------------------    
