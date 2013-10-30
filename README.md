@@ -70,5 +70,5 @@ Notes:
 -----
 Each particle is treated separately from the source to the +1/-1 outcome therefore there is no hidden communication or non-locality. In principle, we can perform the detection step, and save the arrays on separate computers.
 
-Note the similarity with the Weih's et al data described in http://arxiv.org/pdf/quant-ph/0606122.pdf (Fig 1). At first I was worried that the maximum of the E(a,b) did not reach 1 exactly. However, this is exactly what the experiment shows as well (see Fig 1b of the above paper).
+Note the similarity with the Weihs et al data described in http://arxiv.org/pdf/quant-ph/0606122.pdf (Fig 1). At first I was worried that the maximum of the E(a,b) did not reach 1 exactly. However, this is exactly what the experiment shows as well (see Fig 1b of the above paper).
 
