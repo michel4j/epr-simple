@@ -7,16 +7,11 @@ How it works:
 ------------
 The simulation consists of a Source object, generating particle pairs, to be analyzed at 2 Detection stations. The maths of the model can be summarized as:  
 
-        λ = {e, p, s},
-        e ∈ [0..2π) 
-        p ∈ [0..1)
-        s = {1/2, 1}
+        λ = {e, p, s},  e ∈ [0..2π), p ∈ [0..1), s = {1/2, 1}
         e' = e + 2πs
-        n  = 2s
-        k = √2
         A(a,λ) = sign(-1ⁿ cos n(a − e)) if [½(|-1ⁿ cos n(a − e)| + 1)]ᵏ > p, 0 otherwise
         B(b,λ) = sign(-1ⁿ cos n(a − e')) if [½(|-1ⁿ cos n(a − e')| + 1)]ᵏ > p, 0 otherwise
-
+        where n  = 2s, and k = √2
 
 1) The Source, and Particles:
 
@@ -29,7 +24,7 @@ A particle pair is generated as follows:
     `p` - a property common to both particles selected randomly from [0, 1)
     
 The left particle is the tuple `(e, p, s)`
-The right particle is the tuple `(e+2πs, p, s)`
+The right particle is the tuple `(e + 2πs, p, s)`
 
 2) The Detection Stations:  
 
@@ -73,7 +68,7 @@ From these probabilities we can calcualte the Expectation value:
 
     E(a,b) = P⁺⁺ + P⁻⁻ - P⁺⁻ - P⁻⁺   
 
-The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 10,000,000 iterations is shown in epr.png
+The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 100,000,000 iterations is shown in epr.png
 
 Notes:
 -----
