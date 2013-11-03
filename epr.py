@@ -40,17 +40,17 @@ class ProgressMeter(object):
 
 class Source(object):
     """Generate and emit two particles with hidden variables"""
-    def __init__(self, spin=1, phase=numpy.pi):
+    def __init__(self, spin=1):
         self.spin = spin
-        self.phase = phase
+        self.phase = self.spin*2*numpy.pi
+        self.n = 2*self.spin
         
     def emit(self):
         e = numpy.random.uniform(0.0,2*numpy.pi)
-        #p1 = numpy.random.normal(loc=0.5, scale=0.25)
-        p1 = numpy.random.uniform(0.0, 1.0) 
-        p2 = 1 - p1                 # complementary entangled particles
-        lp = (e, p1, self.spin)  # Left particle        
-        rp = (e+self.phase, p2, -self.spin)  # Right particle
+        #p = numpy.sqrt(numpy.random.normal(0.5, 0.5))
+        p = numpy.sqrt(numpy.random.uniform(0.0, 1.0))
+        lp = (e, p, self.n)  # Left particle        
+        rp = (e+self.phase, p, self.n)  # Right particle
         return lp, rp
 
 class Station(object):
@@ -68,14 +68,10 @@ class Station(object):
     def detect(self, particle):
         """Calculate the station outcome for the given `particle`"""
         a = self.get_setting()
-        e, p, s = particle
-        g = numpy.sign(s)
-        n = 2*abs(s)
-        C = ((-1)**n)*numpy.cos(n*(a-e))/2.0
-        Cd = (abs(C) + 0.5)**2
-        if g < 0:  Cd = 1 - Cd # Flip for the other side
+        e, p, n = particle
+        C = ((-1)**n)*numpy.cos(n*(a-e))
          
-        if (p > Cd and g > 0) or (p < Cd and g < 0):
+        if p >= (abs(C/2) + 0.5)**1.4142:
             out = 0 # not detected
         else:
             out = numpy.sign(C)
@@ -148,10 +144,10 @@ class Simulation(object):
         yopp = (alice[sl_opp,1] *  bob[sl_opp,1]).mean()
         ceff = 100.0*(1 - len(abdeg[sl_nc])/float(len(abdeg[sl_nd])))
         aeff = 100.0*(1 - len(abdeg[sl_nd])/float(len(abdeg)))
-        print "Absolute Efficiency %0.4f %%" % (aeff)
-        print "Conditional efficiency %0.4f %%" % (ceff)
-        print "Same Angle <AB> = %0.4f, QM = -1.0" % (ysame)
-        print "Opposite Angle <AB> = %0.4f, QM = 1.0" % (yopp)
+        print "Absolute Efficiency %0.2f %%" % (aeff)
+        print "Conditional efficiency %0.2f %%" % (ceff)
+        print "Same Angle <AB> = %0.2f, QM = -1.0" % (ysame)
+        print "Opposite Angle <AB> = %0.2f, QM = 1.0" % (yopp)
         
         for a in x:
             i = int(a)
@@ -183,10 +179,10 @@ class Simulation(object):
         from matplotlib import rcParams
         
         CHSH = Eab[23] - Eab[68] + Eab[360+23-45] + Eab[68-45]
-        QM = (-numpy.cos(numpy.radians(23)) +
-              numpy.cos(numpy.radians(68)) -
-              numpy.cos(numpy.radians(23-45)) -
-              numpy.cos(numpy.radians(68-45))
+        QM = (-numpy.cos(numpy.radians(22.5)) +
+              numpy.cos(numpy.radians(67.5)) -
+              numpy.cos(numpy.radians(22.5-45)) -
+              numpy.cos(numpy.radians(67.5-45))
              )
         rcParams['legend.loc'] = 'best'
         rcParams['legend.fontsize'] = 8.5
@@ -205,7 +201,7 @@ class Simulation(object):
         plt.plot([0.0, 180.0, 360.0], [-1.0, 1.0, -1.0], 'r--')
         plt.legend()
         plt.savefig('epr.png')
-        print "CHSH = %0.4f, Classical <= 2, QM=%0.4f" % (abs(CHSH), abs(QM))
+        print "CHSH = %0.3f, Classical <= 2, QM=%0.3f" % (abs(CHSH), abs(QM))
         plt.show()
            
 if __name__ == '__main__':
