@@ -40,11 +40,11 @@ The detection proceeds as follows:
     - A random angle `a` is selected in the range [0, 2pi). This is the detector setting.
     - A transformed value `C` is calculated using the particle properties and 
       the detector setting `a` as `C = -1ⁿ cos n(a − e)`. The sign of this value, will 
-      ultimately determine which channel the particle will be detected at `+1` or `-1`
-    - A threshold value value is then calculate from the `C` as
-      `C' = [½(|-1ⁿ cos n(a − e)| + 1)]ᵏ, where k=√2`. This value together with the hidden 
+      ultimately determine which channel the particle will be detected at; `+1` or `-1`
+    - A threshold value C' value is then calculate from the C as
+      C' = [½(|-1ⁿ cos n(a − e)| + 1)]ᵏ, where k=√2. This value together with the hidden 
       particle property `p`, will determine if the particle goes through the filter. 
-      If `C' > p` the particle goes through. Every particle which goes through the 
+      If C' > p the particle goes through. Every particle which goes through the 
       filter is detected by one of the two channels.
     - The setting `a` and the output (`+1`, `-1`, or `0`) are registered locally at each station
       and saved in separate files at the end of the simulation.
