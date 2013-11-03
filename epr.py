@@ -3,7 +3,7 @@ import random
 import time
 import sys
 
-NUM_ITERATIONS = 10000000
+NUM_ITERATIONS = 100000000
 
 class ProgressMeter(object):
     """Displays a progress bar so we know how long it will take"""

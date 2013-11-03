@@ -73,3 +73,5 @@ Each particle is treated separately from the source to detection in a completely
 
 The model reproduces *almost* exactly the QM correlation for both electrons and photons
 and matches experimental data very well. See http://arxiv.org/pdf/quant-ph/0606122.pdf (Fig 1).
+
+Obviously the model violates the CHSH inequality.
