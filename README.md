@@ -41,7 +41,7 @@ The detection proceeds as follows:
     - A transformed value `C` is calculated using the particle properties and 
       the detector setting `a` as `C = -1ⁿ cos n(a − e)`. The sign of this value, will 
       ultimately determine which channel the particle will be detected at; `+1` or `-1`
-    - A threshold value C' value is then calculate from the C as
+    - A threshold value C' is then calculate from C as:
       C' = [½(|-1ⁿ cos n(a − e)| + 1)]ᵏ, where k=√2. This value together with the hidden 
       particle property `p`, will determine if the particle goes through the filter. 
       If C' > p the particle goes through. Every particle which goes through the 
