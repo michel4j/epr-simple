@@ -52,7 +52,7 @@ The detection proceeds as follows:
 
 Statistical Analysis:
 --------------------    
-The statistics are calculated as follows. The angle difference between Alice and Bob's setting is calculated using the first column of their respective output arrays, converted to degrees and rounded to the nearest degree. For each angle in the range [0, 2pi), we collect all instances where that angle difference was observed. Then we count the number of matches/mismatches between the second columns of Alice and Bobs arrays and calculate the probabilities:  
+The statistics are calculated as follows. The angle difference between Alice and Bob's setting is calculated using the first column of their respective output arrays, converted to degrees and rounded to the nearest degree. For each angle in the range [0, 2π), we collect all instances where that angle difference was observed. Then we count the number of matches/mismatches between the second columns of Alice and Bobs arrays and calculate the probabilities:  
 
     - N⁺⁺ : Number of pairs where Both Alice and Bob measured +1
     - N⁻⁻ : ...  Both Alice and Bob measured -1
@@ -73,7 +73,7 @@ From these probabilities we can calcualte the Expectation value:
 
     E(a,b) = P⁺⁺ + P⁻⁻ - P⁺⁻ - P⁻⁺   
 
-The results are then plotted for every angle pair (a,b) in the range [0, 2pi). A sample plot after 10,000,000 iterations is shown in epr.png
+The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 10,000,000 iterations is shown in epr.png
 
 Notes:
 -----
