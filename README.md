@@ -62,10 +62,15 @@ The statistics are calculated as follows. The angle difference between Alice and
     - nB⁺ : ...  Bob got +1
 
 From these counts, we calcualte the individual probabilities:  
+
     Pⁱʲ = Nⁱʲ/(N⁺⁺ + N⁻⁻ + N⁺⁻ + N⁻⁺), ij ∈ {++, --, +-, -+}
+    
 The probability for single sided results Aⁱ and Bⁱ are calculated:  
+
     pAⁱ = nA/(nA⁺ + nA-), pBⁱ = nB/(nB⁺ + nB-), i∈ {+,-}
+    
 From these probabilities we can calcualte the Expectation value:  
+
     E(a,b) = P⁺⁺ + P⁻⁻ - P⁺⁻ - P⁻⁺   
 
 The results are then plotted for every angle pair (a,b) in the range [0, 2pi). A sample plot after 10,000,000 iterations is shown in epr.png
