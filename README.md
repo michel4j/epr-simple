@@ -54,18 +54,21 @@ Statistical Analysis:
 --------------------    
 The statistics are calculated as follows. The angle difference between Alice and Bob's setting is calculated using the first column of their respective output arrays, converted to degrees and rounded to the nearest degree. For each angle in the range [0, 2pi), we collect all instances where that angle difference was observed. Then we count the number of matches/mismatches between the second columns of Alice and Bobs arrays and calculate the probabilities:  
 
-    - P++ : Both Alice and Bob measured +1
-    - P-- : Both Alice and Bob measured -1
-    - P+- : Alice got +1 and Bob got -1
-    - P-+ : Alice got -1 and Bob got +1
-    - A+ : Alice got +1
-    - B+ : Bob got +1
+    - N⁺⁺ : Number of pairs where Both Alice and Bob measured +1
+    - N⁻⁻ : ...  Both Alice and Bob measured -1
+    - N⁺⁻ : ...  Alice got +1 and Bob got -1
+    - N⁻⁺ : ...  Alice got -1 and Bob got +1
+    - nA⁺ : ...  Alice got +1
+    - nB⁺ : ...  Bob got +1
 
-From These probabilities we can calcualte the Expectation value:  
-    
-    - E(a,b) = P++ + P-- - P+- - P-+  
-    
-A sample plot after 10,000,000 iterations is shown in epr.png
+From these counts, we calcualte the individual probabilities:  
+    Pⁱʲ = Nⁱʲ/(N⁺⁺ + N⁻⁻ + N⁺⁻ + N⁻⁺), ij ∈ {++, --, +-, -+}
+The probability for single sided results Aⁱ and Bⁱ are calculated:  
+    pAⁱ = nA/(nA⁺ + nA-), pBⁱ = nB/(nB⁺ + nB-), i∈ {+,-}
+From these probabilities we can calcualte the Expectation value:  
+    E(a,b) = P⁺⁺ + P⁻⁻ - P⁺⁻ - P⁻⁺   
+
+The results are then plotted for every angle pair (a,b) in the range [0, 2pi). A sample plot after 10,000,000 iterations is shown in epr.png
 
 Notes:
 -----
