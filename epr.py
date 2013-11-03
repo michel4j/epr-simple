@@ -40,51 +40,53 @@ class ProgressMeter(object):
 
 class Source(object):
     """Generate and emit two particles with hidden variables"""
-    def __init__(self, spin=0.5, phase=numpy.pi):
+    def __init__(self, spin=1, phase=numpy.pi):
         self.spin = spin
         self.phase = phase
         
     def emit(self):
         e = numpy.random.uniform(0.0,2*numpy.pi)
-        p1 = numpy.random.uniform(0.0, 1.0)
-        p2 = numpy.random.uniform(0.0, 1.0)
+        #p1 = numpy.random.normal(loc=0.5, scale=0.25)
+        p1 = numpy.random.uniform(0.0, 1.0) 
+        p2 = 1 - p1                 # complementary entangled particles
         lp = (e, p1, self.spin)  # Left particle        
-        rp = (self.phase + e, p2, self.spin)  # Right particle
+        rp = (e+self.phase, p2, -self.spin)  # Right particle
         return lp, rp
 
 class Station(object):
     """Detect a particle with a given/random setting"""
-    def __init__(self, fixed_angle=None):
+    def __init__(self):
         """Initialize with fixed_angle, otherwise random fast switching will be used"""
         self.results = numpy.empty((NUM_ITERATIONS, 2))  # columns: angle, +1/-1/0 outcome
         self.results.fill(numpy.nan)
         self.count = 0
-        self.fixed_angle = fixed_angle
         
     def get_setting(self):
         """Return the current detector setting"""
-        if self.fixed_angle is None:
-            return numpy.random.uniform(0.0,numpy.pi*2)
-        else:
-            return self.fixed_angle
+        return numpy.random.uniform(0.0,numpy.pi*2)
         
     def detect(self, particle):
         """Calculate the station outcome for the given `particle`"""
         a = self.get_setting()
         e, p, s = particle
-        C = numpy.cos(s*(e - a))**2 - p
-        tau = s + numpy.random.normal(scale=0.18) # add some detector noise
-        if abs(C) > tau:
-            out = numpy.sign(C)
+        g = numpy.sign(s)
+        n = 2*abs(s)
+        C = ((-1)**n)*numpy.cos(n*(a-e))/2.0
+        Cd = (abs(C) + 0.5)**2
+        if g < 0:  Cd = 1 - Cd # Flip for the other side
+         
+        if (p > Cd and g > 0) or (p < Cd and g < 0):
+            out = 0 # not detected
         else:
-            out = 0.0             
+            out = numpy.sign(C)
+                        
         self.results[self.count] = numpy.array([a, out]) # save angle, outcome pair
         self.count += 1
 
 
 class Simulation(object):
     def __init__(self):
-        self.source = Source(spin=0.5, phase=numpy.pi)
+        self.source = Source(spin=0.5)
         self.alice = Station()
         self.bob = Station()
         
@@ -101,12 +103,14 @@ class Simulation(object):
         numpy.save("Alice", self.alice.results)
         numpy.save("Bob", self.bob.results)
 
-    def analyse(self):
+    def analyse(self, load=False):
         """select coincidences and calculate probabilities for each angle diff"""
-        alice = self.alice.results
-        bob = self.bob.results
-        #alice = numpy.load('Alice.npy') # angle, outcome 
-        #bob = numpy.load('Bob.npy')  # angle, outcome 
+        if not load:
+            alice = self.alice.results
+            bob = self.bob.results
+        else:
+            alice = numpy.load('Alice.npy') # angle, outcome 
+            bob = numpy.load('Bob.npy')  # angle, outcome 
         ab = alice[:,0] - bob[:,0]
         abdeg = numpy.round(numpy.degrees(ab))
         sl_pp = ((alice[:,-1] == +1.0) & (bob[:,-1] == +1.0))
@@ -117,8 +121,9 @@ class Simulation(object):
         sl_bp = (bob[:,-1] == +1.0)
         sl_am = (alice[:,-1] == -1.0)
         sl_bm = (bob[:,-1] == -1.0)
-        sl_nd = ((alice[:,-1] == 0.0) | (bob[:,-1] == 0.0))
-
+        sl_nd = ((alice[:,-1] != 0.0) | (bob[:,-1] != 0.0))
+        sl_nc = ((alice[:,-1] != 0.0) & (bob[:,-1] != 0.0))
+        
         pp = abdeg[sl_pp]
         mm = abdeg[sl_mm]
         pm = abdeg[sl_pm]
@@ -141,7 +146,10 @@ class Simulation(object):
         sl_opp = (abdeg == 180.0) & ((alice[:,-1] != 0.0) & (bob[:,-1] != 0.0))
         ysame = (alice[sl_same,1] *  bob[sl_same,1]).mean()
         yopp = (alice[sl_opp,1] *  bob[sl_opp,1]).mean()
-        #print "Not detected %0.4f" % (len(abdeg[sl_nd])/float(len(abdeg)))
+        ceff = 100.0*(1 - len(abdeg[sl_nc])/float(len(abdeg[sl_nd])))
+        aeff = 100.0*(1 - len(abdeg[sl_nd])/float(len(abdeg)))
+        print "Absolute Efficiency %0.4f %%" % (aeff)
+        print "Conditional efficiency %0.4f %%" % (ceff)
         print "Same Angle <AB> = %0.4f, QM = -1.0" % (ysame)
         print "Opposite Angle <AB> = %0.4f, QM = 1.0" % (yopp)
         
@@ -202,5 +210,9 @@ class Simulation(object):
            
 if __name__ == '__main__':
     sim = Simulation()
-    sim.run()
-    sim.analyse()        
+    if len(sys.argv) == 1:
+        sim.run()
+        load = False
+    else:
+        load = True
+    sim.analyse(load)        
