@@ -21,7 +21,7 @@ The simulation consists of a Source object, generating particle pairs, to be ana
 1) The Source, and Particles:
 
 Simply generates two tuples each with 3 parameters corresponding to the "hidden variables".
-The source has a single parameter `spin (s)` which determined the type of particles produces. For spin 1/2 particles such as electrons, s=1/2 for photons s=1.
+The source has a single parameter `spin (s)` which determine the type of particles produced. For spin 1/2 particles such as electrons, s=1/2 for photons s=1.
 
 A particle pair is generated as follows:  
 
