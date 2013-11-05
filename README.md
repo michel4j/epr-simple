@@ -21,7 +21,7 @@ The source has a single parameter `spin (s)` which determine the type of particl
 A particle pair is generated as follows:  
 
     `e` - an angle common to both particles selected randomly each time from the range [0, 2pi)
-    `p` - a property common to both particles selected randomly from [0, 1)
+    `p` - a property common to both particles selected randomly from [0, π/4)
     
 The left particle is the tuple `(e, p, s)`
 The right particle is the tuple `(e + 2πs, p, s)`
