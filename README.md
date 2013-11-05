@@ -7,11 +7,11 @@ How it works:
 ------------
 The simulation consists of a Source object, generating particle pairs, to be analyzed at 2 Detection stations. The maths of the model can be summarized as:  
 
-        λ = {e, p, s},  e ∈ [0..2π), p ∈ [0..1), s = {1/2, 1}
+        λ = {e, p, s},  e ∈ [0..2π), p ∈ [0..π/4), s = {1/2, 1}
         e' = e + 2πs
-        A(a,λ) = sign(-1ⁿ cos n(a − e)) if [½(|-1ⁿ cos n(a − e)| + 1)]ᵏ > p, 0 otherwise
-        B(b,λ) = sign(-1ⁿ cos n(a − e')) if [½(|-1ⁿ cos n(a − e')| + 1)]ᵏ > p, 0 otherwise
-        where n  = 2s, and k = √2
+        A(a,λ) = sign(-1ⁿ cos n(a − e)) if ½|cos n(a − e)|² > p, 0 otherwise
+        B(b,λ) = sign(-1ⁿ cos n(a − e')) if ½|cos n(a − e)|² > p, 0 otherwise
+        where n  = 2s
 
 1) The Source, and Particles:
 
@@ -37,7 +37,7 @@ The detection proceeds as follows:
       the detector setting `a` as `C = -1ⁿ cos n(a − e)`. The sign of this value, will 
       ultimately determine which channel the particle will be detected at; `+1` or `-1`
     - A threshold value C' is then calculate from C as:
-      C' = [½(|-1ⁿ cos n(a − e)| + 1)]ᵏ, where k=√2. This value together with the hidden 
+      C' = ½|cos n(a − e)|² > p. This value together with the hidden 
       particle property `p`, will determine if the particle goes through the filter. 
       If C' > p the particle goes through. Every particle which goes through the 
       filter is detected by one of the two channels.
@@ -68,7 +68,17 @@ From these probabilities we can calcualte the Expectation value:
 
     E(a,b) = P⁺⁺ + P⁻⁻ - P⁺⁻ - P⁻⁺   
 
-The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 100,000,000 iterations is shown in epr.png
+The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 20,000,000 iterations is shown in `epr.png`. The output for the Bell-test angles (0, 22.5, 45, 67.5) are shown below:  
+    
+    E(  0.0, 22.5), <AB>=-0.92, QM=-0.92
+    E(  0.0, 67.5), <AB>=-0.36, QM=-0.38
+    E( 45.0, 22.5), <AB>=-0.92, QM=-0.92
+    E( 45.0, 67.5), <AB>=-0.92, QM=-0.92
+
+    Same Angle <AB> = -1.00, QM = -1.00
+    Oppo Angle <AB> = +1.00, QM = +1.00
+    CHSH: <= 2.0, MODEL: 2.40, QM: 2.39
+
 
 Notes:
 -----
