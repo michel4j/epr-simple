@@ -9,9 +9,9 @@ The simulation consists of a Source object, generating particle pairs, to be ana
 
         λ = {e, p, s},  e ∈ [0..2π), p ∈ [0..π/4), s = {1/2, 1}
         e' = e + 2πs
-        A(a,λ) = sign(-1ⁿ cos n(a − e)) if ½|cos n(a − e)|² > p, 0 otherwise
-        B(b,λ) = sign(-1ⁿ cos n(a − e')) if ½|cos n(a − e)|² > p, 0 otherwise
-        where n  = 2s
+        A(a,λ) = sign(-1ⁿ cos n(a − e)) if ½|cos n(a − e)|² > pᵏ, 0 otherwise
+        B(b,λ) = sign(-1ⁿ cos n(a − e')) if ½|cos n(a − e)|² > pᵏ, 0 otherwise
+        where n = 2s, k=π
 
 1) The Source, and Particles:
 
