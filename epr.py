@@ -63,10 +63,11 @@ class Source(object):
         self.phase = self.spin*2*numpy.pi
         self.n = 2*self.spin
         self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION))
+        self.ps = numpy.sqrt(2)*numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2)
         
     def emit(self):
         e = numpy.random.choice(self.angles) # numpy.random.uniform(0.0,2*numpy.pi)
-        p = numpy.random.uniform(0, numpy.pi/4)
+        p = numpy.random.choice(self.ps)  #numpy.random.uniform(0, numpy.pi/4)
         lp = (e, p, self.n)  # Left particle        
         rp = (e+self.phase, p, self.n)  # Right particle
         return lp, rp
@@ -90,8 +91,7 @@ class Station(object):
         a = self.get_setting()
         e, p, n = particle        
         C = ((-1)**n)*numpy.cos(n*(a-e))
-        Cp = 0.5*abs(C)**2
-        out =  p**numpy.pi < Cp and numpy.sign(C) or 0.0        
+        out =  p < abs(C) and numpy.sign(C) or 0.0        
         self.results[self.count] = numpy.array([a, out]) # save angle, outcome
         self.properties[self.count] = numpy.array([e, p]) # save e, p
         self.count += 1
@@ -220,7 +220,7 @@ class Simulation(object):
         print
         print "Same Angle <AB> = %+0.2f, QM = -1.00" % (ysame)
         print "Oppo Angle <AB> = %+0.2f, QM = +1.00" % (yopp)
-        print "CHSH: < 2.0, MODEL: %0.2f, QM: %0.2f" % (abs(CHSH[0]-CHSH[1]+CHSH[2]+CHSH[3]), abs(QM[0]-QM[1]+QM[2]+QM[3]))
+        print "CHSH: < 2.0, MODEL: %0.3f, QM: %0.3f" % (abs(CHSH[0]-CHSH[1]+CHSH[2]+CHSH[3]), abs(QM[0]-QM[1]+QM[2]+QM[3]))
             
         gs = gridspec.GridSpec(2,1)
         ax1 = plt.subplot(gs[0])    
