@@ -2,8 +2,26 @@ import numpy
 import random
 import time
 import sys
+from matplotlib import pyplot as plt
+from matplotlib import rcParams
+import matplotlib.gridspec as gridspec
+rcParams['legend.loc'] = 'best'
+rcParams['legend.fontsize'] = 8.5
+rcParams['legend.isaxes'] = False
+rcParams['figure.facecolor'] = 'white'
+rcParams['figure.edgecolor'] = 'white'
 
-NUM_ITERATIONS = 100000000
+NUM_ITERATIONS = 20000000
+ANGLE_RESOLUTION = 7.5
+
+def idx(x):
+    if x < 0:
+       x += 360
+    x = x%360
+    return int(round(x/ANGLE_RESOLUTION))
+
+def val(x):
+    return round(x/ANGLE_RESOLUTION)*ANGLE_RESOLUTION
 
 class ProgressMeter(object):
     """Displays a progress bar so we know how long it will take"""
@@ -44,47 +62,51 @@ class Source(object):
         self.spin = spin
         self.phase = self.spin*2*numpy.pi
         self.n = 2*self.spin
+        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION))
         
     def emit(self):
-        e = numpy.random.uniform(0.0,2*numpy.pi)
-        #p = numpy.sqrt(numpy.random.normal(0.5, 0.5))
-        p = numpy.sqrt(numpy.random.uniform(0.0, 1.0))
+        e = numpy.random.choice(self.angles) # numpy.random.uniform(0.0,2*numpy.pi)
+        p = numpy.random.uniform(0, numpy.pi/4)
         lp = (e, p, self.n)  # Left particle        
         rp = (e+self.phase, p, self.n)  # Right particle
         return lp, rp
 
 class Station(object):
     """Detect a particle with a given/random setting"""
-    def __init__(self):
-        """Initialize with fixed_angle, otherwise random fast switching will be used"""
-        self.results = numpy.empty((NUM_ITERATIONS, 2))  # columns: angle, +1/-1/0 outcome
+    def __init__(self, name='Alice'):
+        self.name = name
+        self.results = numpy.empty((NUM_ITERATIONS, 2))  # columns: angle, +1/-1/0 outcome        
+        self.properties = numpy.empty((NUM_ITERATIONS, 2)) # columns: e, p
         self.results.fill(numpy.nan)
         self.count = 0
+        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION))
         
     def get_setting(self):
         """Return the current detector setting"""
-        return numpy.random.uniform(0.0,numpy.pi*2)
+        return numpy.random.choice(self.angles)
         
     def detect(self, particle):
         """Calculate the station outcome for the given `particle`"""
         a = self.get_setting()
-        e, p, n = particle
+        e, p, n = particle        
         C = ((-1)**n)*numpy.cos(n*(a-e))
-         
-        if p >= (abs(C/2) + 0.5)**1.4142:
-            out = 0 # not detected
-        else:
-            out = numpy.sign(C)
-                        
-        self.results[self.count] = numpy.array([a, out]) # save angle, outcome pair
+        Cp = 0.5*abs(C)**2
+        out =  p**numpy.pi < Cp and numpy.sign(C) or 0.0        
+        self.results[self.count] = numpy.array([a, out]) # save angle, outcome
+        self.properties[self.count] = numpy.array([e, p]) # save e, p
         self.count += 1
 
+    def save(self):
+        """Save the results"""
+        numpy.save("%s" % self.name, self.results)
+        numpy.save("%s-hv" % self.name, self.properties)
+        
 
 class Simulation(object):
     def __init__(self):
         self.source = Source(spin=0.5)
-        self.alice = Station()
-        self.bob = Station()
+        self.alice = Station('Alice')
+        self.bob = Station('Bob')
         
     def run(self):
         """generate and detect particles"""
@@ -96,19 +118,27 @@ class Simulation(object):
             progress.update(1)
             
         # save results in separate files each is a list of angles and +/- outcomes
-        numpy.save("Alice", self.alice.results)
-        numpy.save("Bob", self.bob.results)
+        self.alice.save()
+        self.bob.save()
 
     def analyse(self, load=False):
         """select coincidences and calculate probabilities for each angle diff"""
         if not load:
             alice = self.alice.results
             bob = self.bob.results
+            alice_hv = self.alice.properties
+            bob_hv = self.bob.properties
         else:
             alice = numpy.load('Alice.npy') # angle, outcome 
             bob = numpy.load('Bob.npy')  # angle, outcome 
-        ab = alice[:,0] - bob[:,0]
-        abdeg = numpy.round(numpy.degrees(ab))
+            alice_hv = numpy.load('Alice-hv.npy') # hidden variables
+            bob_hv = numpy.load('Bob-hv.npy') # hidden variables
+
+        ab = alice[:,0] - bob[:,0]        
+        abdeg = numpy.round(numpy.degrees(ab)/ANGLE_RESOLUTION)*ANGLE_RESOLUTION
+        adeg  = numpy.round(numpy.degrees(alice[:,0])/ANGLE_RESOLUTION)*ANGLE_RESOLUTION
+        bdeg  = numpy.round(numpy.degrees(bob[:,0])/ANGLE_RESOLUTION)*ANGLE_RESOLUTION
+        
         sl_pp = ((alice[:,-1] == +1.0) & (bob[:,-1] == +1.0))
         sl_mm = ((alice[:,-1] == -1.0) & (bob[:,-1] == -1.0))
         sl_pm = ((alice[:,-1] == +1.0) & (bob[:,-1] == -1.0))
@@ -117,8 +147,8 @@ class Simulation(object):
         sl_bp = (bob[:,-1] == +1.0)
         sl_am = (alice[:,-1] == -1.0)
         sl_bm = (bob[:,-1] == -1.0)
-        sl_nd = ((alice[:,-1] != 0.0) | (bob[:,-1] != 0.0))
-        sl_nc = ((alice[:,-1] != 0.0) & (bob[:,-1] != 0.0))
+        sl_sd = (numpy.abs(alice[:,-1])+numpy.abs(bob[:,-1]) > 0.0)
+        sl_dd = (alice[:,-1]*bob[:,-1] != 0.0) 
         
         pp = abdeg[sl_pp]
         mm = abdeg[sl_mm]
@@ -129,7 +159,7 @@ class Simulation(object):
         am = abdeg[sl_am]
         bm = abdeg[sl_bm]
         
-        x = numpy.arange(360.)
+        x = numpy.arange(0.0, 360.0, ANGLE_RESOLUTION)
         ypp = numpy.zeros_like(x)
         ymm = numpy.zeros_like(x)
         ypm = numpy.zeros_like(x)
@@ -137,20 +167,9 @@ class Simulation(object):
         yap = numpy.zeros_like(x)
         ybp = numpy.zeros_like(x)
         Eab = numpy.zeros_like(x)
-
-        sl_same = (abdeg == 0.0) & ((alice[:,-1] != 0.0) & (bob[:,-1] != 0.0))
-        sl_opp = (abdeg == 180.0) & ((alice[:,-1] != 0.0) & (bob[:,-1] != 0.0))
-        ysame = (alice[sl_same,1] *  bob[sl_same,1]).mean()
-        yopp = (alice[sl_opp,1] *  bob[sl_opp,1]).mean()
-        ceff = 100.0*(1 - len(abdeg[sl_nc])/float(len(abdeg[sl_nd])))
-        aeff = 100.0*(1 - len(abdeg[sl_nd])/float(len(abdeg)))
-        print "Absolute Efficiency %0.2f %%" % (aeff)
-        print "Conditional efficiency %0.2f %%" % (ceff)
-        print "Same Angle <AB> = %0.2f, QM = -1.0" % (ysame)
-        print "Opposite Angle <AB> = %0.2f, QM = 1.0" % (yopp)
+        coinc = numpy.zeros_like(x)
         
-        for a in x:
-            i = int(a)
+        for i, a in enumerate(x):
             lpp = len(pp[(pp==a)]) # ++
             lmm = len(mm[(mm==a)]) # --
             lpm = len(pm[(pm==a)]) # -+
@@ -160,7 +179,8 @@ class Simulation(object):
             Na = len(ap[ap==a]) +len(am[am==a])
             Nb = len(bp[bp==a]) + len(bm[bm==a])
             tot = lpp + lmm + lpm + lmp
-            
+            sel = (abdeg == a)
+            coinc[i] = float(len(abdeg[sel & sl_dd]))/len(abdeg[sel & sl_sd])
             if tot != 0.0:
                 ypp[i] = float(lpp)/tot
                 ymm[i] = float(lmm)/tot
@@ -174,34 +194,53 @@ class Simulation(object):
             if Nb != 0.0:
                 ybp[i] = float(lbp)/Nb
         
-        # Plot results   
-        from matplotlib import pyplot as plt
-        from matplotlib import rcParams
+        # Display results   
+        a = val(0.0)
+        ap = val(45.0)
+        b = val(22.5)
+        bp = val(67.5)
         
-        CHSH = Eab[23] - Eab[68] + Eab[360+23-45] + Eab[68-45]
-        QM = (-numpy.cos(numpy.radians(22.5)) +
-              numpy.cos(numpy.radians(67.5)) -
-              numpy.cos(numpy.radians(22.5-45)) -
-              numpy.cos(numpy.radians(67.5-45))
-             )
-        rcParams['legend.loc'] = 'best'
-        rcParams['legend.fontsize'] = 8.5
-        rcParams['legend.isaxes'] = False
-        rcParams['figure.facecolor'] = 'white'
-        rcParams['figure.edgecolor'] = 'white'
+        sl_same = (adeg == bdeg) & (alice[:, 1]*bob[:,1] != 0.0)
+        sl_opp = (numpy.abs(adeg - bdeg) == val(180.0)) & (alice[:, 1]*bob[:,1] != 0.0)
+        ysame = (alice[sl_same, 1] * bob[sl_same,1]).mean()
+        yopp = (alice[sl_opp, 1] *  bob[sl_opp, 1]).mean()
+        
+        DESIG = {0 : '<a1b1>', 1: '<a2d2>', 2: '<c3b3>', 3: '<c4d4>'}    
+        CHSH = []
+        QM = []
+        for k,(i,j) in enumerate([(a,b),(a,bp), (ap,b), (ap, bp)]):
+            sel = (adeg==i) & (bdeg==j) & (alice[:,1] != 0.0) & (bob[:,1] != 0.0)
+            Ai = alice[sel, 1] 
+            Bj = bob[sel, 1]
+            print "%s: E(%5.1f,%5.1f), AB=%+0.2f, QM=%+0.2f" % (DESIG[k],i, j, (Ai*Bj).mean(),
+                 -numpy.cos(numpy.radians(j-i)))
+            CHSH.append( (Ai*Bj).mean())
+            QM.append( -numpy.cos(numpy.radians(j-i)) )
+       
+        print
+        print "Same Angle <AB> = %+0.2f, QM = -1.00" % (ysame)
+        print "Oppo Angle <AB> = %+0.2f, QM = +1.00" % (yopp)
+        print "CHSH: < 2.0, MODEL: %0.2f, QM: %0.2f" % (abs(CHSH[0]-CHSH[1]+CHSH[2]+CHSH[3]), abs(QM[0]-QM[1]+QM[2]+QM[3]))
+            
+        gs = gridspec.GridSpec(2,1)
+        ax1 = plt.subplot(gs[0])    
+        ax1.plot(x, Eab, 'm-', label='Sim: E(a,b)')
+        ax1.plot(x, -numpy.cos(numpy.radians(x)), 'b.', label='QM: -cos(ab)')
+        ax1.plot([0.0, 180.0, 360.0], [-1.0, 1.0, -1.0], 'r--')
+        ax1.legend()
+        
+        ax2 = plt.subplot(gs[1])       
+        ax2.plot(x, ypp, label='P++')
+        ax2.plot(x, ymm, label='P--')
+        ax2.plot(x, ypm, label='P+-')
+        ax2.plot(x, ymp, label='P-+')
+        ax2.plot(x, yap, label='P+(A)')
+        ax2.plot(x, ybp, label='P+(B)')
+        ax2.legend()
+        
+        for ax in [ax1, ax2]:  ax.set_xlim(0, 360)
 
-        plt.plot(x, ypp, label='++')
-        plt.plot(x, ymm, label='--')
-        plt.plot(x, ypm, label='+-')
-        plt.plot(x, ymp, label='-+')
-        plt.plot(x, yap, label='A+')
-        plt.plot(x, ybp, label='B+')
-        plt.plot(x, Eab, label='E(a,b)')
-        plt.plot(x, -numpy.cos(numpy.radians(x)), 'r:', label='-cos(ab)')
-        plt.plot([0.0, 180.0, 360.0], [-1.0, 1.0, -1.0], 'r--')
-        plt.legend()
-        plt.savefig('epr.png')
-        print "CHSH = %0.3f, Classical <= 2, QM=%0.3f" % (abs(CHSH), abs(QM))
+        plt.savefig('epr.png', dpi=100)
         plt.show()
            
 if __name__ == '__main__':
