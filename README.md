@@ -8,13 +8,13 @@ How it works:
 The simulation consists of a Source object, generating particle pairs, to be analyzed at 2 Detection stations. The maths of the model can be summarized as:  
 
         λ = {e, p, s},  e ∈ [0..2π), s = {1/2, 1}
-        p =  ½ sin²x, x ∈ [0..π/2)
+        p =  ½ sin²t, t ∈ [0..π/2)
         e' = e + 2πs
         A(a,λ) = sign(-1ⁿ cos n(a − e)) if |cos n(a − e)| > p, 0 otherwise
         B(b,λ) = sign(-1ⁿ cos n(b − e')) if |cos n(b − e')| > p, 0 otherwise
         where n = 2s
         
-        Alternatively,  p = xᵏ, x ∈ [0..π/4), k=π/2 also works well.
+        Alternatively,  p = tᵏ, t ∈ [0..π/4), k=π/2 also works well.
 
 1) The Source, and Particles:
 
@@ -25,7 +25,7 @@ A particle pair is generated as follows:
 
     `e` - an angle common to both particles selected randomly each time from the range [0, 2π)
     `p` - a property common to both particles selected randomly from 
-          the distribution `½ sin²x, x ∈ [0..π/2)`
+          the distribution `½ sin²t, t ∈ [0..π/2)`
     
 The left particle is the tuple `(e, p, n)`
 The right particle is the tuple `(e + 2πs, p, n)`
