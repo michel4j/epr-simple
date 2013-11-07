@@ -70,14 +70,14 @@ From these probabilities we can calcualte the Expectation value:
 
 The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 50,000,000 iterations is shown in `epr.png`. The output for the Bell-test angles (0, 22.5, 45, 67.5) are shown below:  
     
-    E(  0.0, 22.5), <AB>=-0.92, QM=-0.92
-    E(  0.0, 67.5), <AB>=-0.36, QM=-0.38
-    E( 45.0, 22.5), <AB>=-0.92, QM=-0.92
-    E( 45.0, 67.5), <AB>=-0.92, QM=-0.92
-
-    Same Angle <AB> = -1.00, QM = -1.00
-    Oppo Angle <AB> = +1.00, QM = +1.00
-    CHSH: <= 2.0, MODEL: 2.40, QM: 2.39
+        <a1b1>: E(  0.0, 22.5), AB=-0.93, QM=-0.92
+        <a2d2>: E(  0.0, 67.5), AB=-0.39, QM=-0.38
+        <c3b3>: E( 45.0, 22.5), AB=-0.92, QM=-0.92
+        <c4d4>: E( 45.0, 67.5), AB=-0.93, QM=-0.92
+        
+        Same Angle <AB> = -1.00, QM = -1.00
+        Oppo Angle <AB> = +1.00, QM = +1.00
+        CHSH: < 2.0, MODEL: 2.396, QM: 2.389
 
 
 Notes:
