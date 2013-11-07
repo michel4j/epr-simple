@@ -11,7 +11,7 @@ rcParams['legend.isaxes'] = False
 rcParams['figure.facecolor'] = 'white'
 rcParams['figure.edgecolor'] = 'white'
 
-NUM_ITERATIONS = 5000000
+NUM_ITERATIONS = 20000000
 ANGLE_RESOLUTION = 7.5
 
 class Source(object):
@@ -20,8 +20,8 @@ class Source(object):
         self.spin = spin
         self.phase = self.spin*2*numpy.pi
         self.n = 2*self.spin
-        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION))
-        self.ps = numpy.sqrt(2)*numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2) # best
+        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION)) 
+        self.ps = numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2)
         
     def emit(self):
         e = numpy.random.choice(self.angles)

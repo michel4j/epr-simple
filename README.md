@@ -9,8 +9,8 @@ The simulation consists of a Source object, generating particle pairs, to be ana
 
         λ = {e, p, s},  e ∈ [0..2π), p ∈ [0..π/4), s = {1/2, 1}
         e' = e + 2πs
-        A(a,λ) = sign(-1ⁿ cos n(a − e)) if |cos n(a − e)| > √2pᵏ, 0 otherwise
-        B(b,λ) = sign(-1ⁿ cos n(b − e')) if |cos n(b − e')| > √2pᵏ, 0 otherwise
+        A(a,λ) = sign(-1ⁿ cos n(a − e)) if |cos n(a − e)| > pᵏ, 0 otherwise
+        B(b,λ) = sign(-1ⁿ cos n(b − e')) if |cos n(b − e')| > pᵏ, 0 otherwise
         where n = 2s, k=π/2
 
 1) The Source, and Particles:
@@ -38,7 +38,7 @@ The detection at each station proceeds as follows:
       ultimately determine which channel the particle will be detected at; `+1` or `-1`
     - The absolute value of `C` together with the particle property `p` will determine 
       if the particle goes through the filter.
-      If `|C|` > √2p^π/2 the particle goes through. Every particle which goes through the 
+      If `|C|` > p^π/2 the particle goes through. Every particle which goes through the 
       filter is detected by one of the two channels.
     - The setting `x` and the output (`+1`, `-1`, or `0`) are registered locally at each station
       and saved in separate files at the end of the simulation. Each station is not aware of and 
@@ -70,14 +70,14 @@ From these probabilities we can calcualte the Expectation value:
 
 The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 50,000,000 iterations is shown in `epr.png`. The output for the Bell-test angles (0, 22.5, 45, 67.5) are shown below:  
     
-        <a1b1>: E(  0.0, 22.5), AB=-0.93, QM=-0.92
-        <a2d2>: E(  0.0, 67.5), AB=-0.39, QM=-0.38
-        <c3b3>: E( 45.0, 22.5), AB=-0.92, QM=-0.92
-        <c4d4>: E( 45.0, 67.5), AB=-0.93, QM=-0.92
-        
-        Same Angle <AB> = -1.00, QM = -1.00
-        Oppo Angle <AB> = +1.00, QM = +1.00
-        CHSH: < 2.0, MODEL: 2.396, QM: 2.389
+    <a1b1>: E(  0.0, 22.5), AB=-0.92, QM=-0.92
+    <a2d2>: E(  0.0, 67.5), AB=-0.39, QM=-0.38
+    <c3b3>: E( 45.0, 22.5), AB=-0.92, QM=-0.92
+    <c4d4>: E( 45.0, 67.5), AB=-0.92, QM=-0.92
+
+    Same Angle <AB> = -1.00, QM = -1.00
+    Oppo Angle <AB> = +1.00, QM = +1.00
+    CHSH: <= 2.0, Sim: 2.380, QM: 2.389
 
 
 Notes:
