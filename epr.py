@@ -11,7 +11,8 @@ rcParams['legend.isaxes'] = False
 rcParams['figure.facecolor'] = 'white'
 rcParams['figure.edgecolor'] = 'white'
 
-NUM_ITERATIONS = 20000000
+NUM_ITERATIONS = 50000000
+MAX_ANGLE = 360.0
 ANGLE_RESOLUTION = 7.5
 
 class Source(object):
@@ -21,7 +22,8 @@ class Source(object):
         self.phase = self.spin*2*numpy.pi
         self.n = 2*self.spin
         self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION))  # pre-calculate angles to choose from 
-        self.ps = numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2) # pre-calculate p-values to choose from 
+        #self.ps = numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2) # pre-calculate p-values to choose from
+        self.ps = 0.5*numpy.sin(numpy.linspace(0, numpy.pi/2, 1000))**2 # alternate p-distribution
         
     def emit(self):
         e = numpy.random.choice(self.angles) # pick one of the angles randomly 
@@ -38,7 +40,7 @@ class Station(object):
         self.results = numpy.empty((NUM_ITERATIONS, 2))  # columns: angle, +1/-1/0 outcome        
         self.properties = numpy.empty((NUM_ITERATIONS, 2)) # columns: e, p
         self.count = 0
-        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION)) # pre-calculate p-values to choose from
+        self.angles = numpy.radians(numpy.arange(0, MAX_ANGLE, ANGLE_RESOLUTION)) # pre-calculate p-values to choose from
         
     def get_setting(self):
         """Return the current detector setting"""
@@ -117,7 +119,7 @@ class Simulation(object):
         am = abdeg[sl_am]
         bm = abdeg[sl_bm]
         
-        x = numpy.arange(0.0, 360.0, ANGLE_RESOLUTION)
+        x = numpy.arange(0.0, MAX_ANGLE, ANGLE_RESOLUTION)
         ypp = numpy.zeros_like(x)
         ymm = numpy.zeros_like(x)
         ypm = numpy.zeros_like(x)
@@ -179,7 +181,8 @@ class Simulation(object):
         print "Same Angle <AB> = %+0.2f, QM = -1.00" % (ysame)
         print "Oppo Angle <AB> = %+0.2f, QM = +1.00" % (yopp)
         print "CHSH: < 2.0, Sim: %0.3f, QM: %0.3f" % (abs(CHSH[0]-CHSH[1]+CHSH[2]+CHSH[3]), abs(QM[0]-QM[1]+QM[2]+QM[3]))
-        print "Efficiency:  %0.1f %%" % (100.0*sl_dd.sum()/sl_sd.sum())  
+        print "Detector Efficiency:  %0.1f %%" % (100.0*sl_sd.mean())  
+        print "%% Coincidences:  %0.1f %%" % (100.0*sl_dd.sum()/sl_sd.sum())  
           
         gs = gridspec.GridSpec(2,1)
         ax1 = plt.subplot(gs[0])    
@@ -197,8 +200,8 @@ class Simulation(object):
         ax2.plot(x, ybp, label='P+(B)')
         ax2.legend()
         
-        for ax in [ax1, ax2]:  ax.set_xlim(0, 360)
-
+        for ax in [ax1, ax2]:  ax.set_xlim(0, MAX_ANGLE)
+        ax1.set_title('%d emitted particle pairs' % NUM_ITERATIONS)
         plt.savefig('epr.png', dpi=100)
         plt.show()
 

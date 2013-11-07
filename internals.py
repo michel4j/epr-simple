@@ -113,8 +113,8 @@ def analyse():
     print "Same Angle <AB> = %+0.2f, QM = -1.00" % (ysame)
     print "Oppo Angle <AB> = %+0.2f, QM = +1.00" % (yopp)
     print "CHSH: < 2.0, Sim: %0.3f, QM: %0.3f" % (abs(CHSH[0]-CHSH[1]+CHSH[2]+CHSH[3]), abs(QM[0]-QM[1]+QM[2]+QM[3]))
-    print "Efficiency:  %0.1f %%" % (100.0*sl_dd.sum()/sl_sd.sum())  
     print "Detector Efficiency:  %0.1f %%" % (100.0*sl_sd.mean())  
+    print "%% Coincidences:  %0.1f %%" % (100.0*sl_dd.sum()/sl_sd.sum())  
             
     gs = gridspec.GridSpec(3,2)
     ax1 = plt.subplot(gs[0,:])    
@@ -133,8 +133,9 @@ def analyse():
     ax2.legend()
     
     ax3 =  plt.subplot(gs[1,1])       
-    ax3.plot(x, coinc, 'b--', label='% Coincidence')
-    ax3.plot(x, geff, 'r--', label='% Detector Efficiency')
+    ax3.plot(x, 100*coinc, 'b--', label='% Coincidence')
+    ax3.plot(x, 100*geff, 'r--', label='% Detector Efficiency')
+    ax3.set_ylim(0,105)
     ax3.legend()
     
     ax4 = plt.subplot(gs[2,:])
