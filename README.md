@@ -9,40 +9,40 @@ The simulation consists of a Source object, generating particle pairs, to be ana
 
         λ = {e, p, s},  e ∈ [0..2π), p ∈ [0..π/4), s = {1/2, 1}
         e' = e + 2πs
-        A(a,λ) = sign(-1ⁿ cos n(a − e)) if ½|cos n(a − e)|² > pᵏ, 0 otherwise
-        B(b,λ) = sign(-1ⁿ cos n(a − e')) if ½|cos n(a − e)|² > pᵏ, 0 otherwise
-        where n = 2s, k=π
+        A(a,λ) = sign(-1ⁿ cos n(a − e)) if |cos n(a − e)| > √2pᵏ, 0 otherwise
+        B(b,λ) = sign(-1ⁿ cos n(b − e')) if |cos n(b − e)| > √pᵏ, 0 otherwise
+        where n = 2s, k=π/2
 
 1) The Source, and Particles:
 
 Simply generates two tuples each with 3 parameters corresponding to the "hidden variables".
-The source has a single parameter `spin (s)` which determine the type of particles produced. For spin 1/2 particles such as electrons, s=1/2 for photons s=1.
+The source has a single parameter `spin (s)` which determines the type of particles produced. For spin 1/2 particles such as electrons, s=1/2 for photons s=1.
 
 A particle pair is generated as follows:  
 
     `e` - an angle common to both particles selected randomly each time from the range [0, 2pi)
     `p` - a property common to both particles selected randomly from [0, π/4)
     
-The left particle is the tuple `(e, p, s)`
-The right particle is the tuple `(e + 2πs, p, s)`
+The left particle is the tuple `(e, p, n)`
+The right particle is the tuple `(e + 2πs, p, n)`
 
 2) The Detection Stations:  
 
 Two stations exist named `Alice` and `Bob`. Alice will measure the left particle, while Bob will measure the right particle.
 
-The detection proceeds as follows:  
+The detection at each station proceeds as follows:  
 
-    - A random angle `a` is selected in the range [0, 2pi). This is the detector setting.
+    - A random angle `x` is selected in the range [0, 2π). This is the detector setting.
     - A transformed value `C` is calculated using the particle properties and 
-      the detector setting `a` as `C = -1ⁿ cos n(a − e)`. The sign of this value, will 
+      the detector setting `x` as `C = -1ⁿ cos n(x − e)`. The sign of this value, will 
       ultimately determine which channel the particle will be detected at; `+1` or `-1`
-    - A threshold value C' is then calculate from C as:
-      C' = ½|cos n(a − e)|² > p. This value together with the hidden 
-      particle property `p`, will determine if the particle goes through the filter. 
-      If C' > p the particle goes through. Every particle which goes through the 
+    - The absolute value of `C` together with the particle property `p` will determine 
+      if the particle goes through the filter.
+      If `|C|` > √p^π/2 the particle goes through. Every particle which goes through the 
       filter is detected by one of the two channels.
-    - The setting `a` and the output (`+1`, `-1`, or `0`) are registered locally at each station
-      and saved in separate files at the end of the simulation.
+    - The setting `x` and the output (`+1`, `-1`, or `0`) are registered locally at each station
+      and saved in separate files at the end of the simulation. Each station is not aware of and 
+      uses no information from or about the other station. 
       
 
 Statistical Analysis:

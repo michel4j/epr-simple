@@ -11,7 +11,7 @@ rcParams['legend.isaxes'] = False
 rcParams['figure.facecolor'] = 'white'
 rcParams['figure.edgecolor'] = 'white'
 
-NUM_ITERATIONS = 20000000
+NUM_ITERATIONS = 50000000
 ANGLE_RESOLUTION = 7.5
 
 def idx(x):
@@ -63,11 +63,11 @@ class Source(object):
         self.phase = self.spin*2*numpy.pi
         self.n = 2*self.spin
         self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION))
-        self.ps = numpy.sqrt(2)*numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2)
+        self.ps = numpy.sqrt(2)*numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2) # best
         
     def emit(self):
-        e = numpy.random.choice(self.angles) # numpy.random.uniform(0.0,2*numpy.pi)
-        p = numpy.random.choice(self.ps)  #numpy.random.uniform(0, numpy.pi/4)
+        e = numpy.random.choice(self.angles)
+        p = numpy.random.choice(self.ps)  
         lp = (e, p, self.n)  # Left particle        
         rp = (e+self.phase, p, self.n)  # Right particle
         return lp, rp
@@ -147,8 +147,8 @@ class Simulation(object):
         sl_bp = (bob[:,-1] == +1.0)
         sl_am = (alice[:,-1] == -1.0)
         sl_bm = (bob[:,-1] == -1.0)
-        sl_sd = (numpy.abs(alice[:,-1])+numpy.abs(bob[:,-1]) > 0.0)
-        sl_dd = (alice[:,-1]*bob[:,-1] != 0.0) 
+        sl_sd = (numpy.abs(alice[:,-1])+numpy.abs(bob[:,-1]) > 0.0) # single detections
+        sl_dd = (alice[:,-1]*bob[:,-1] != 0.0)                      # double detections (coincidences)
         
         pp = abdeg[sl_pp]
         mm = abdeg[sl_mm]
@@ -170,22 +170,22 @@ class Simulation(object):
         coinc = numpy.zeros_like(x)
         
         for i, a in enumerate(x):
-            lpp = len(pp[(pp==a)]) # ++
-            lmm = len(mm[(mm==a)]) # --
-            lpm = len(pm[(pm==a)]) # -+
-            lmp = len(mp[(mp==a)]) # +-
-            lap = len(ap[ap==a])
-            lbp = len(bp[bp==a])
-            Na = len(ap[ap==a]) +len(am[am==a])
-            Nb = len(bp[bp==a]) + len(bm[bm==a])
-            tot = lpp + lmm + lpm + lmp
+            lpp = (pp==a).sum() # ++
+            lmm = (mm==a).sum() # --
+            lpm = (pm==a).sum() # -+
+            lmp = (mp==a).sum() # +-
+            lap = (ap==a).sum() # A+
+            lbp = (bp==a).sum() # B+
+            Na = (ap==a).sum() + (am==a).sum()
+            Nb = (bp==a).sum() + (bm==a).sum()
+            tot = float(lpp + lmm + lpm + lmp)
             sel = (abdeg == a)
-            coinc[i] = float(len(abdeg[sel & sl_dd]))/len(abdeg[sel & sl_sd])
+            coinc[i] = float((sel & sl_dd).sum())/(sel & sl_sd).sum()
             if tot != 0.0:
-                ypp[i] = float(lpp)/tot
-                ymm[i] = float(lmm)/tot
-                ypm[i] = float(lpm)/tot
-                ymp[i] = float(lmp)/tot
+                ypp[i] = lpp/tot
+                ymm[i] = lmm/tot
+                ypm[i] = lpm/tot
+                ymp[i] = lmp/tot
             
             Eab[i] = ypp[i] + ymm[i] - ypm[i] - ymp[i]
             # single sided +/- outcome probabilities
@@ -200,8 +200,8 @@ class Simulation(object):
         b = val(22.5)
         bp = val(67.5)
         
-        sl_same = (adeg == bdeg) & (alice[:, 1]*bob[:,1] != 0.0)
-        sl_opp = (numpy.abs(adeg - bdeg) == val(180.0)) & (alice[:, 1]*bob[:,1] != 0.0)
+        sl_same = (adeg == bdeg) & sl_dd
+        sl_opp = (numpy.abs(adeg - bdeg) == val(180.0)) & sl_dd
         ysame = (alice[sl_same, 1] * bob[sl_same,1]).mean()
         yopp = (alice[sl_opp, 1] *  bob[sl_opp, 1]).mean()
         
@@ -221,7 +221,8 @@ class Simulation(object):
         print "Same Angle <AB> = %+0.2f, QM = -1.00" % (ysame)
         print "Oppo Angle <AB> = %+0.2f, QM = +1.00" % (yopp)
         print "CHSH: < 2.0, MODEL: %0.3f, QM: %0.3f" % (abs(CHSH[0]-CHSH[1]+CHSH[2]+CHSH[3]), abs(QM[0]-QM[1]+QM[2]+QM[3]))
-            
+        print "Efficiency:  %0.1f %%" % (100.0*sl_dd.sum()/sl_sd.sum())  
+          
         gs = gridspec.GridSpec(2,1)
         ax1 = plt.subplot(gs[0])    
         ax1.plot(x, Eab, 'm-', label='Sim: E(a,b)')
