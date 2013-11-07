@@ -94,10 +94,8 @@ Obviously the model violates the CHSH inequality.
 To run the simulation yourself, you need at least 4GB of memory but you can run fewer iterations by changing the NUM_ITERATIONS constant. 
 On my Computer, it runs ~20,000 particle pairs per second and I can get reasonable statistics from about 1,000,000 photon pairs.
 
-On any linux system you need to have `matplotlib` installed for the plotting, as well as `numpy`. Then simply run:  
+On any Linux system, you need to have `matplotlib` installed for the plotting, as well as `numpy`. Then simply run:  
         
         python epr.py
 
-and wait for it to complete. It will show you a progress bar as well as how many particle pairs it is simulating per second.
-
-I haven't tested on Windows but you probably want a "batteries-included" python distribution such as "Python xy" http://code.google.com/p/pythonxy/. 
+and wait for it to complete. It will show you a progress bar as well as how many particle pairs it is simulating per second. I haven't tested on Windows but you probably want a "batteries-included" python distribution such as "Python xy" http://code.google.com/p/pythonxy/. 
