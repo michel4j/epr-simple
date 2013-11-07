@@ -146,7 +146,7 @@ def analyse():
 
     for ax in [ax1, ax2, ax3]:  ax.set_xlim(0, 360)
 
-    plt.savefig('internals.png')
+    plt.savefig('internals.png', dpi=72)
     plt.show()
            
 if __name__ == '__main__':
