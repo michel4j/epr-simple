@@ -96,7 +96,7 @@ and matches experimental data very well. See http://arxiv.org/pdf/quant-ph/06061
 Obviously the model violates the CHSH inequality.
 
 To run the simulation yourself, you need at least 4GB of memory but you can run fewer iterations by changing the NUM_ITERATIONS constant. 
-On my Computer, it runs ~20,000 particle pairs per second and I can get reasonable statistics from about 1,000,000 photon pairs.
+On my Computer, it runs ~20,000 particle pairs per second and I can get reasonable statistics from about 1,000,000 pairs.
 
 On any Linux system, you need to have `matplotlib` installed for the plotting, as well as `numpy`. Then simply run:  
         
