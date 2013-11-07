@@ -68,7 +68,7 @@ From these probabilities we can calcualte the Expectation value:
 
     E(a,b) = P⁺⁺ + P⁻⁻ - P⁺⁻ - P⁻⁺   
 
-The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 20,000,000 iterations is shown in `epr.png`. The output for the Bell-test angles (0, 22.5, 45, 67.5) are shown below:  
+The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after 50,000,000 iterations is shown in `epr.png`. The output for the Bell-test angles (0, 22.5, 45, 67.5) are shown below:  
     
     E(  0.0, 22.5), <AB>=-0.92, QM=-0.92
     E(  0.0, 67.5), <AB>=-0.36, QM=-0.38
