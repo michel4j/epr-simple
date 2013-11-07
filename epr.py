@@ -11,50 +11,8 @@ rcParams['legend.isaxes'] = False
 rcParams['figure.facecolor'] = 'white'
 rcParams['figure.edgecolor'] = 'white'
 
-NUM_ITERATIONS = 50000000
+NUM_ITERATIONS = 5000000
 ANGLE_RESOLUTION = 7.5
-
-def idx(x):
-    if x < 0:
-       x += 360
-    x = x%360
-    return int(round(x/ANGLE_RESOLUTION))
-
-def val(x):
-    return round(x/ANGLE_RESOLUTION)*ANGLE_RESOLUTION
-
-class ProgressMeter(object):
-    """Displays a progress bar so we know how long it will take"""
-    def __init__(self, **kw):
-        self.total = int(kw.get('total', 100)) # Number of units to process
-        self.count = int(kw.get('count', 0))   # Number of units already processed
-        self.refresh_rate = float(kw.get('rate_refresh', .5)) # Refresh rate in seconds
-        self.meter_ticks = int(kw.get('ticks', 50)) # Number of ticks in meter
-        self.meter_division = float(self.total) / self.meter_ticks
-        self.meter_value = int(self.count / self.meter_division)
-        self.current_rate = 0.0
-        self.last_refresh = 0
-        self.start_time = time.time()
-        sys.stdout.write(chr(27) + '[s')
-
-    def update(self, count, **kw):
-        """Increment progres count by `count` amount"""
-        now = time.time()
-        self.count += count 
-        self.current_rate = self.count/(now - self.start_time)
-        self.meter_value = max(int(self.count / self.meter_division), self.meter_value)
-        if (now - self.last_refresh) > self.refresh_rate or (self.count >= self.total):
-            sys.stdout.write(chr(27) + '[2K') # clear the line and reset cursor
-            sys.stdout.write(chr(27) + '[u')
-            sys.stdout.write(chr(27) + '[s')
-            meter = '[%s>%s] %d%%  %10.2e/sec' % (
-                    '-' * self.meter_value, ' ' * (self.meter_ticks - self.meter_value), 
-                    (float(self.count) / self.total) * 100, self.current_rate)
-            sys.stdout.write(meter)
-            if self.count >= self.total:
-                sys.stdout.write('\n')
-            sys.stdout.flush()
-            self.last_refresh = time.time()
 
 class Source(object):
     """Generate and emit two particles with hidden variables"""
@@ -220,7 +178,7 @@ class Simulation(object):
         print
         print "Same Angle <AB> = %+0.2f, QM = -1.00" % (ysame)
         print "Oppo Angle <AB> = %+0.2f, QM = +1.00" % (yopp)
-        print "CHSH: < 2.0, MODEL: %0.3f, QM: %0.3f" % (abs(CHSH[0]-CHSH[1]+CHSH[2]+CHSH[3]), abs(QM[0]-QM[1]+QM[2]+QM[3]))
+        print "CHSH: < 2.0, Sim: %0.3f, QM: %0.3f" % (abs(CHSH[0]-CHSH[1]+CHSH[2]+CHSH[3]), abs(QM[0]-QM[1]+QM[2]+QM[3]))
         print "Efficiency:  %0.1f %%" % (100.0*sl_dd.sum()/sl_sd.sum())  
           
         gs = gridspec.GridSpec(2,1)
@@ -243,6 +201,43 @@ class Simulation(object):
 
         plt.savefig('epr.png', dpi=100)
         plt.show()
+
+def val(x):
+    """Round value to the nearest ANGLE_RESOLUTION"""
+    return round(x/ANGLE_RESOLUTION)*ANGLE_RESOLUTION
+
+class ProgressMeter(object):
+    """Displays a progress bar so we know how long it will take"""
+    def __init__(self, **kw):
+        self.total = int(kw.get('total', 100)) # Number of units to process
+        self.count = int(kw.get('count', 0))   # Number of units already processed
+        self.refresh_rate = float(kw.get('rate_refresh', .5)) # Refresh rate in seconds
+        self.meter_ticks = int(kw.get('ticks', 50)) # Number of ticks in meter
+        self.meter_division = float(self.total) / self.meter_ticks
+        self.meter_value = int(self.count / self.meter_division)
+        self.current_rate = 0.0
+        self.last_refresh = 0
+        self.start_time = time.time()
+        sys.stdout.write(chr(27) + '[s')
+
+    def update(self, count, **kw):
+        """Increment progres count by `count` amount"""
+        now = time.time()
+        self.count += count 
+        self.current_rate = self.count/(now - self.start_time)
+        self.meter_value = max(int(self.count / self.meter_division), self.meter_value)
+        if (now - self.last_refresh) > self.refresh_rate or (self.count >= self.total):
+            sys.stdout.write(chr(27) + '[2K') # clear the line and reset cursor
+            sys.stdout.write(chr(27) + '[u')
+            sys.stdout.write(chr(27) + '[s')
+            meter = '[%s>%s] %d%%  %10.2e/sec' % (
+                    '-' * self.meter_value, ' ' * (self.meter_ticks - self.meter_value), 
+                    (float(self.count) / self.total) * 100, self.current_rate)
+            sys.stdout.write(meter)
+            if self.count >= self.total:
+                sys.stdout.write('\n')
+            sys.stdout.flush()
+            self.last_refresh = time.time()
            
 if __name__ == '__main__':
     sim = Simulation()
