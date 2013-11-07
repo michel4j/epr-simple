@@ -20,12 +20,12 @@ class Source(object):
         self.spin = spin
         self.phase = self.spin*2*numpy.pi
         self.n = 2*self.spin
-        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION)) 
-        self.ps = numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2)
+        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION))  # pre-calculate angles to choose from 
+        self.ps = numpy.linspace(0, numpy.pi/4, 1000)**(numpy.pi/2) # pre-calculate p-values to choose from 
         
     def emit(self):
-        e = numpy.random.choice(self.angles)
-        p = numpy.random.choice(self.ps)  
+        e = numpy.random.choice(self.angles) # pick one of the angles randomly 
+        p = numpy.random.choice(self.ps)  # pick one of the p values randomly
         lp = (e, p, self.n)  # Left particle        
         rp = (e+self.phase, p, self.n)  # Right particle
         return lp, rp
@@ -34,25 +34,25 @@ class Station(object):
     """Detect a particle with a given/random setting"""
     def __init__(self, name='Alice'):
         self.name = name
+        # create arrays to store results for this station
         self.results = numpy.empty((NUM_ITERATIONS, 2))  # columns: angle, +1/-1/0 outcome        
         self.properties = numpy.empty((NUM_ITERATIONS, 2)) # columns: e, p
-        self.results.fill(numpy.nan)
         self.count = 0
-        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION))
+        self.angles = numpy.radians(numpy.arange(0, 360.0, ANGLE_RESOLUTION)) # pre-calculate p-values to choose from
         
     def get_setting(self):
         """Return the current detector setting"""
-        return numpy.random.choice(self.angles)
+        return numpy.random.choice(self.angles) # pick one angle randomly from pre-calculated set
         
     def detect(self, particle):
         """Calculate the station outcome for the given `particle`"""
         a = self.get_setting()
         e, p, n = particle        
         C = ((-1)**n)*numpy.cos(n*(a-e))
-        out =  p < abs(C) and numpy.sign(C) or 0.0        
+        out =  p < abs(C) and numpy.sign(C) or 0.0  # if |C| > p then particle is detected by sign(C) channel
         self.results[self.count] = numpy.array([a, out]) # save angle, outcome
         self.properties[self.count] = numpy.array([e, p]) # save e, p
-        self.count += 1
+        self.count += 1 
 
     def save(self):
         """Save the results"""
@@ -70,9 +70,9 @@ class Simulation(object):
         """generate and detect particles"""
         progress = ProgressMeter(total=NUM_ITERATIONS)
         for i in range(NUM_ITERATIONS):
-            left_particle, right_particle = self.source.emit()
-            self.alice.detect(left_particle)
-            self.bob.detect(right_particle)
+            left_particle, right_particle = self.source.emit() # generate two particles from source
+            self.alice.detect(left_particle)  # send left particle to Alice
+            self.bob.detect(right_particle)  # send right particle to Bob
             progress.update(1)
             
         # save results in separate files each is a list of angles and +/- outcomes
