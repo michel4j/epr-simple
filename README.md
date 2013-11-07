@@ -84,7 +84,20 @@ Notes:
 -----
 Each particle is treated separately from the source to detection in a completely local and realistic manner. In fact the whole simulation can be performed on separate computers.
 
+Each detection station behaves exactly the same as the other. Swapping the particles and sending them the opposite way does not change the results.
+
 The model reproduces *almost* exactly the QM correlation for both electrons and photons
 and matches experimental data very well. See http://arxiv.org/pdf/quant-ph/0606122.pdf (Fig 1).
 
 Obviously the model violates the CHSH inequality.
+
+To run the simulation yourself, you need at least 4GB of memory but you can run fewer iterations by changing the NUM_ITERATIONS constant. 
+On my Computer, it runs ~20,000 particle pairs per second and I can get reasonable statistics from about 1,000,000 photon pairs.
+
+On any linux system you need to have `matplotlib` installed for the plotting, as well as `numpy`. Then simply run:  
+        
+        python epr.py
+
+and wait for it to complete. It will show you a progress bar as well as how many particle pairs it is simulating per second.
+
+I haven't tested on Windows but you probably want a "batteries-included" python distribution such as "Python xy" http://code.google.com/p/pythonxy/. 
