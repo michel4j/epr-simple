@@ -94,7 +94,7 @@ Each detection station behaves exactly the same as the other. Swapping the parti
 The model reproduces *almost* exactly the QM correlation for both electrons and photons
 and matches experimental data very well. See http://arxiv.org/pdf/quant-ph/0606122.pdf (Fig 1).
 
-Obviously the model violates the CHSH inequality.
+Obviously the model would "violate" the CHSH inequality in the same way as QM predictions and experimental expectation values. More careful study of the inequalities actually reveal that such violation by QM, experiments, and simulations like this are only apparent.
 
 To run the simulation yourself, you need at least 4GB of memory but you can run fewer iterations by changing the NUM_ITERATIONS constant. 
 On my Computer, it runs ~20,000 particle pairs per second and I can get reasonable statistics from about 1,000,000 pairs.
