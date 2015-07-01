@@ -10,8 +10,8 @@ The simulation consists of a Source object, generating particle pairs, to be ana
         λ = {e, p, s},  e ∈ [0..2π), s = {1/2, 1}
         p =  ½ sin²t, t ∈ [0..π/2)
         e' = e + 2πs
-        A(a,λ) = sign(-1ⁿ cos n(a − e)) if |cos n(a − e)| > p, 0 otherwise
-        B(b,λ) = sign(-1ⁿ cos n(b − e')) if |cos n(b − e')| > p, 0 otherwise
+        A(a,λ) = sign(-1ⁿ cos n(a − e)) if |cos n(a − e)| > p
+        B(b,λ) = sign(-1ⁿ cos n(b − e')) if |cos n(b − e')| > p
         where n = 2s
         
         Alternatively,  p = tᵏ, t ∈ [0..π/4), k=π/2 also works well.
