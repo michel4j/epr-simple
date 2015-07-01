@@ -40,12 +40,7 @@ The detection at each station proceeds as follows:
     - A transformed value `C` is calculated using the particle properties and 
       the detector setting `x` as `C = -1ⁿ cos n(x − e)`. The sign of this value, will 
       ultimately determine which channel the particle will be detected at; `+1` or `-1`
-    - The absolute value of `C` together with the particle property `p` will determine 
-      if the particle goes through the filter.
-      If `|C| > p` the particle goes through. Every particle which goes through the 
-      filter is detected by one of the two channels.
-      
-    - The setting `x` and the output (`+1`, `-1`, or `0`) are registered locally at each station
+    - The setting `x` and the outputs are registered locally at each station
       and saved in separate files at the end of the simulation. Each station is not aware of and 
       uses no information from or about the other station. 
       
