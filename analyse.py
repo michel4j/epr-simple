@@ -119,7 +119,7 @@ def analyse(spin=PARTICLE_SPIN):
     ax2 = fig.add_subplot(122, projection='3d')
     ax2.plot_surface(X, Y, Corr, rstride=1, cstride=1, cmap=cm.coolwarm)
     ax2.view_init(elev=45., azim=45)
-    plt.savefig('analysis.png', dpi=72)
+    plt.savefig('analysis.png', dpi=90)
     plt.show()
     
 def QMFunc(a, spin):
