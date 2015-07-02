@@ -56,7 +56,7 @@ The output file will be named `Alice.npy.gz` if provided source file was `SrcLef
     - The setting `x` and the outcomes are registered locally. Each station is not aware of and 
       uses no information from or about the other station. In fact, the `SrcLeft.npy.gz` and `SrcRight.npy.gz`
       can be copied onto separate computers disconnected from the network, and a copy of the station program run
-      on those computers to generate the 
+      on those computers to generate the output files
       
 
 Statistical Analysis:
