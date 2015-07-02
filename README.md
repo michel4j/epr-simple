@@ -89,12 +89,12 @@ From these probabilities we can calcualte the Expectation value:
 The results are then plotted for every angle pair (a,b) in the range [0, 2π). A sample plot after a 60 second simulation is shown in the file `analysis.png`. The output for the Bell-test angles (0, 22.5, 45, 67.5) are shown below:  
 
 
-Expectation values
-  Settings       N_ab   <AB>_sim    <AB>_qm StdErr_sim
-   0, 22.5       1534     -0.934     -0.924      0.024
-   0, 67.5       1364     -0.391     -0.383      0.011
-  45, 22.5       1510     -0.926     -0.924      0.024
-  45, 67.5       1532     -0.943     -0.924      0.024
+    Expectation values
+      Settings       N_ab   <AB>_sim    <AB>_qm StdErr_sim
+       0, 22.5       1534     -0.934     -0.924      0.024
+       0, 67.5       1364     -0.391     -0.383      0.011
+      45, 22.5       1510     -0.926     -0.924      0.024
+      45, 67.5       1532     -0.943     -0.924      0.024
 
 	Same Angle <AB> = -1.00
 	Oppo Angle <AB> = +1.00
@@ -105,16 +105,16 @@ Expectation values
 Notes:
 -----
 
-Each particle is treated separately from the source to detection in a completely local and realistic manner. In fact the whole simulation can be performed on separate computers as illustrated above, with the analysis performed on a fourth computer. A typical run of a "separate computer" version of the simulation would look like the following:
+Each particle is treated separately from the source to detection in a completely local and realistic manner. In fact the whole simulation can be performed on separate computers as illustrated above, with the analysis performed on a fourth computer. A typical run of a "separate computer" version of the simulation would look like the following:  
 
-Computer 1: python source.py 60 0.5
--Copy SrcLeft.npy.gz to computer 2
--Copy SrcRight.npy.gz to computer 3
-Computer 2: python station.py SrcLeft.npy.gz
-Computer 3: python station.py SrcRight.npy.gz
--Copy Alice.npy.gz from computer 2 to computer 4
--Copy SrcRight.npy.gz from computer 3 to computer 4
-Computer 4: python analyse.py 0.5
+    Computer 1: python source.py 60 0.5  
+        -Copy SrcLeft.npy.gz to computer 2  
+        -Copy SrcRight.npy.gz to computer 3  
+    Computer 2: python station.py SrcLeft.npy.gz  
+    Computer 3: python station.py SrcRight.npy.gz  
+        -Copy Alice.npy.gz from computer 2 to computer 4  
+        -Copy SrcRight.npy.gz from computer 3 to computer 4  
+    Computer 4: python analyse.py 0.5  
 
 
 
