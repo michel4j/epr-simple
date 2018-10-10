@@ -113,7 +113,7 @@ Each particle is treated separately from the source to detection in a completely
     Computer 2: python station.py SrcLeft.npy.gz  
     Computer 3: python station.py SrcRight.npy.gz  
         -Copy Alice.npy.gz from computer 2 to computer 4  
-        -Copy SrcRight.npy.gz from computer 3 to computer 4  
+        -Copy Bob.npy.gz from computer 3 to computer 4  
     Computer 4: python analyse.py 0.5  
 
 
